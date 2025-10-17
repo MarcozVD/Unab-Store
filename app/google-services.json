@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1085800745065",
+    "project_id": "loginfirebase-9114c",
+    "storage_bucket": "loginfirebase-9114c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1085800745065:android:4fcee735b223b901963af8",
+        "android_client_info": {
+          "package_name": "me.marcosvalera.unabstore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNwiD7b9UVWlv4cqnmK41FmL-lVHR4y88"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
