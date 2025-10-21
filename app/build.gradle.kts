@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -67,6 +68,8 @@ dependencies {
 
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    //auth
+    implementation(libs.firebase.auth)
 
 
 }

@@ -23,11 +23,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onClickLogout:()->Unit={}) {
+    val auth = Firebase.auth
+    val user= auth.currentUser
+
     Scaffold(
         topBar = {
             MediumTopAppBar(
@@ -45,7 +50,10 @@ fun HomeScreen() {
                     IconButton(onClick = { }) {
                         Icon(Icons.Filled.ShoppingCart, "Carrito")
                     }
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        auth.signOut()
+                        onClickLogout()
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ExitToApp, "Salir")
                     }
                 },
@@ -72,6 +80,11 @@ fun HomeScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("HOME SCREEN", fontSize = 30.sp)
+                if (user!=null){
+                    Text(user.email.toString())
+                }else{
+                    Text("No hay usuario")
+                }
             }
         }
     }
