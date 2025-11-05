@@ -1,7 +1,6 @@
 package me.marcosvalera.unabstore
 
 import android.util.Patterns
-import androidx.compose.ui.graphics.vector.Path
 
 fun validationEmail(email:String):Pair<Boolean,String> {
     return when{
