@@ -1,90 +1,100 @@
 package me.marcosvalera.unabstore
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MediumTopAppBar
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import kotlinx.coroutines.launch
 
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onClickLogout:()->Unit={}) {
-    val auth = Firebase.auth
-    val user= auth.currentUser
+fun HomeScreen() {
+    val repository = remember { ProductoRepository() }
+    val scope = rememberCoroutineScope()
+
+    var productos by remember { mutableStateOf<List<Producto>>(emptyList()) }
+    var mostrarCard by remember { mutableStateOf(false) }
+
+    // 🔹 Cargar productos al iniciar
+    LaunchedEffect(Unit) {
+        productos = repository.obtenerProductos()
+    }
 
     Scaffold(
         topBar = {
             MediumTopAppBar(
                 title = {
                     Text(
-                        "Unab Shop",
+                        "Unab Store",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp
+                        fontSize = 24.sp,
+                        color = Color.White
                     )
                 },
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Filled.Notifications, "Notificaciones")
-                    }
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Filled.ShoppingCart, "Carrito")
-                    }
-                    IconButton(onClick = {
-                        auth.signOut()
-                        onClickLogout()
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, "Salir")
-                    }
-                },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = Color(0xFFFF9900),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    containerColor = Color(0xFFFF9900)
                 )
             )
         },
-        bottomBar = {
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { mostrarCard = true },
+                containerColor = Color(0xFFFF9900)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Agregar producto")
+            }
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFF5F5F5))
                 .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("HOME SCREEN", fontSize = 30.sp)
-                if (user!=null){
-                    Text(user.email.toString())
-                }else{
-                    Text("No hay usuario")
+            if (productos.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No hay productos disponibles")
                 }
+            } else {
+                LazyColumn {
+                    items(productos) { producto ->
+                        ProductoItem(
+                            producto = producto,
+                            onDelete = {
+                                scope.launch {
+                                    producto.id?.let {
+                                        repository.eliminarProducto(it)
+                                        productos = repository.obtenerProductos()
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            // 🔹 Mostrar Card flotante para agregar producto
+            if (mostrarCard) {
+                AddProductCard(
+                    onDismiss = { mostrarCard = false },
+                    onProductoAgregado = {
+                        scope.launch {
+                            productos = repository.obtenerProductos()
+                            mostrarCard = false
+                        }
+                    }
+                )
             }
         }
     }

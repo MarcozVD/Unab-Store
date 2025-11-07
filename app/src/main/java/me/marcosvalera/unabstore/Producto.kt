@@ -1,7 +1,5 @@
 package me.marcosvalera.unabstore
 
-
-
 data class Producto(
     val id: String? = null,
     val nombre: String = "",
